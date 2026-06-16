@@ -40,7 +40,7 @@
       <view class="section-title">设施服务</view>
       <scroll-view class="facilities-scroll" scroll-x="true" show-scrollbar="false">
         <view class="facilities-list">
-          <view class="facility-item" v-for="(item, index) in displayedFacilities" :key="index" @click="showFacilityDetail(item)">
+          <view class="facility-item" v-for="(item, index) in displayedFacilities" :key="index" @click="showFacilityDetail(item)" @tap="showFacilityDetail(item)">
             <view class="facility-icon">{{ item.icon }}</view>
             <text class="facility-name">{{ item.name }}</text>
           </view>
@@ -529,8 +529,10 @@ function closeFacilities() {
 }
 
 function showFacilityDetail(item: Facility) {
+  console.log('showFacilityDetail clicked', item)
   selectedFacility.value = item
   showFacilityDetailPopup.value = true
+  console.log('showFacilityDetailPopup set to', showFacilityDetailPopup.value)
 }
 
 function closeFacilityDetail() {
