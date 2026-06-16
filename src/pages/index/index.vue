@@ -15,8 +15,11 @@
           <text class="search-camera" @click.stop="handleCameraSearch(-1)">📷</text>
         </view>
         <!-- 右侧：消息 -->
-        <view class="message-btn">
+        <view class="message-btn" @click="goToNotify">
           <text class="message-icon">🔔</text>
+          <view v-if="unreadCount > 0" class="unread-badge">
+            <text class="unread-text">{{ unreadCount > 99 ? '99+' : unreadCount }}</text>
+          </view>
         </view>
       </view>
     </view>
@@ -123,6 +126,77 @@
         </view>
       </view>
     </scroll-view>
+
+    <!-- 城市选择面板 -->
+    <view v-if="showCityPanel" class="city-panel-mask" @click="showCityPanel = false">
+      <view class="city-panel" @click.stop>
+        <view class="panel-header">
+          <text class="panel-title">选择城市</text>
+          <text class="panel-close" @click="showCityPanel = false">✕</text>
+        </view>
+        <view class="panel-body">
+          <view class="city-current">
+            <text class="city-current-label">当前定位：</text>
+            <text class="city-current-name">{{ currentCity }}</text>
+          </view>
+          <view class="city-section-title">热门城市</view>
+          <view class="city-grid">
+            <view
+              v-for="city in hotCities"
+              :key="city"
+              class="city-grid-item"
+              :class="{ active: currentCity === city }"
+              @click="selectCity(city)"
+            >
+              {{ city }}
+            </view>
+          </view>
+          <view class="city-section-title">全部城市</view>
+          <view class="city-list">
+            <view
+              v-for="city in allCities"
+              :key="city"
+              class="city-list-item"
+              :class="{ active: currentCity === city }"
+              @click="selectCity(city)"
+            >
+              {{ city }}
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 通知面板 -->
+    <view v-if="showNotifyPanel" class="notify-panel-mask" @click="showNotifyPanel = false">
+      <view class="notify-panel" @click.stop>
+        <view class="panel-header">
+          <text class="panel-title">消息通知</text>
+          <text class="panel-close" @click="showNotifyPanel = false">✕</text>
+        </view>
+        <view class="notify-body">
+          <view v-if="notifications.length === 0" class="notify-empty">
+            <text class="notify-empty-icon">📭</text>
+            <text class="notify-empty-text">暂无新消息</text>
+          </view>
+          <view
+            v-for="(item, index) in notifications"
+            :key="index"
+            class="notify-item"
+            :class="{ unread: !item.read }"
+            @click="readNotify(index)"
+          >
+            <text class="notify-item-icon">{{ item.icon }}</text>
+            <view class="notify-item-content">
+              <view class="notify-item-title">{{ item.title }}</view>
+              <view class="notify-item-desc">{{ item.desc }}</view>
+              <view class="notify-item-time">{{ item.time }}</view>
+            </view>
+            <view v-if="!item.read" class="notify-dot"></view>
+          </view>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -132,6 +206,20 @@ import { useUserStore } from '@/store/user'
 
 const userStore = useUserStore()
 const currentCity = ref('河内')
+const showCityPanel = ref(false)
+const showNotifyPanel = ref(false)
+const unreadCount = ref(3)
+
+const hotCities = ['河内', '胡志明市', '岘港', '芽庄', '曼谷', '清迈', '新加坡', '吉隆坡']
+const allCities = ['河内', '胡志明市', '岘港', '芽庄', '海防', '大叻', '顺化', '会安', '曼谷', '清迈', '普吉', '芭提雅', '新加坡', '吉隆坡', '首尔', '东京']
+
+const notifications = ref([
+  { icon: '📦', title: '物流通知', desc: '您的包裹已发出，预计3-5天到达', time: '10分钟前', read: false },
+  { icon: '🎉', title: '优惠活动', desc: '限时特惠！全场满199减50', time: '30分钟前', read: false },
+  { icon: '💰', title: '退款到账', desc: '您的退款已到账，请查收', time: '2小时前', read: false },
+  { icon: '🎁', title: '新人礼包', desc: '恭喜您获得新人专属优惠券', time: '1天前', read: true },
+  { icon: '📢', title: '系统公告', desc: '平台服务升级通知', time: '3天前', read: true },
+])
 
 // 金刚区数据
 const kingkongRow1 = ref([
@@ -287,7 +375,23 @@ const gotoDetail = (id: number, source: number) => {
 
 // 选择城市
 const chooseCity = () => {
-  // TODO: 城市选择
+  showCityPanel.value = true
+}
+
+const selectCity = (city: string) => {
+  currentCity.value = city
+  showCityPanel.value = false
+  uni.showToast({ title: `已切换到${city}`, icon: 'none' })
+}
+
+// 通知
+const goToNotify = () => {
+  showNotifyPanel.value = true
+}
+
+const readNotify = (index: number) => {
+  notifications.value[index].read = true
+  unreadCount.value = notifications.value.filter(n => !n.read).length
 }
 
 // 启动倒计时
@@ -708,5 +812,225 @@ onUnmounted(() => {
 .waterfall-sales {
   font-size: 20rpx;
   color: #999;
+}
+
+/* ==================== 消息未读角标 ==================== */
+.message-btn {
+  flex-shrink: 0;
+  padding: 8rpx;
+  position: relative;
+}
+
+.unread-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 32rpx;
+  height: 32rpx;
+  background: #ff3b30;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+}
+
+.unread-text {
+  font-size: 20rpx;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* ==================== 城市选择面板 ==================== */
+.city-panel-mask,
+.notify-panel-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: flex-end;
+}
+
+.city-panel,
+.notify-panel {
+  background: #fff;
+  width: 100%;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 32rpx;
+  max-height: 80vh;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.panel-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.panel-close {
+  font-size: 36rpx;
+  color: #999;
+  padding: 8rpx;
+}
+
+.panel-body {
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+.city-current {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+  padding: 20rpx;
+  background: #fff5f0;
+  border-radius: 12rpx;
+}
+
+.city-current-label {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.city-current-name {
+  font-size: 30rpx;
+  color: #ff5000;
+  font-weight: bold;
+}
+
+.city-section-title {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+  margin-top: 16rpx;
+}
+
+.city-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.city-grid-item {
+  width: calc(25% - 12rpx);
+  text-align: center;
+  padding: 20rpx 0;
+  background: #f5f5f5;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.city-grid-item.active {
+  background: linear-gradient(90deg, #ff9000, #ff5000);
+  color: #fff;
+  font-weight: 500;
+}
+
+.city-list-item {
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+  font-size: 30rpx;
+  color: #333;
+}
+
+.city-list-item.active {
+  color: #ff5000;
+  font-weight: bold;
+}
+
+/* ==================== 通知面板 ==================== */
+.notify-body {
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+.notify-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 0;
+}
+
+.notify-empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.notify-empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.notify-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+  position: relative;
+}
+
+.notify-item.unread {
+  background: #fffbf5;
+  margin: 0 -32rpx;
+  padding: 24rpx 32rpx;
+}
+
+.notify-item-icon {
+  font-size: 48rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.notify-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notify-item-title {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.notify-item-desc {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notify-item-time {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.notify-dot {
+  width: 16rpx;
+  height: 16rpx;
+  background: #ff3b30;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 16rpx;
+  margin-left: 12rpx;
 }
 </style>
