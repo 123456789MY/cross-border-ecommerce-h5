@@ -1,0 +1,198 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "首页"
+			}
+		},
+		{
+			"path": "pages/login/index",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/register/index",
+			"style": {
+				"navigationBarTitleText": "注册"
+			}
+		},
+		{
+			"path": "pages/search/index",
+			"style": {
+				"navigationBarTitleText": "搜索",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/search/result",
+			"style": {
+				"navigationBarTitleText": "搜索结果",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/products/list",
+			"style": {
+				"navigationBarTitleText": "商品列表",
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/products/detail",
+			"style": {
+				"navigationBarTitleText": "商品详情",
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/cart/index",
+			"style": {
+				"navigationBarTitleText": "购物车"
+			}
+		},
+		{
+			"path": "pages/order/list",
+			"style": {
+				"navigationBarTitleText": "我的订单"
+			}
+		},
+		{
+			"path": "pages/order/confirm",
+			"style": {
+				"navigationBarTitleText": "确认订单"
+			}
+		},
+		{
+			"path": "pages/user/index",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path": "pages/pay/index",
+			"style": {
+				"navigationBarTitleText": "订单支付",
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/pay/result",
+			"style": {
+				"navigationBarTitleText": "支付结果",
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/user/profile",
+			"style": {
+				"navigationBarTitleText": "个人资料"
+			}
+		},
+		{
+			"path": "pages/user/address",
+			"style": {
+				"navigationBarTitleText": "收货地址"
+			}
+		},
+		{
+			"path": "pages/user/realname",
+			"style": {
+				"navigationBarTitleText": "实名认证"
+			}
+		},
+		{
+			"path": "pages/user/apply-seller",
+			"style": {
+				"navigationBarTitleText": "商家入驻"
+			}
+		},
+		{
+			"path": "pages/secondhand/list",
+			"style": {
+				"navigationBarTitleText": "二手交易"
+			}
+		},
+		{
+			"path": "pages/secondhand/detail",
+			"style": {
+				"navigationBarTitleText": "二手详情"
+			}
+		},
+		{
+			"path": "pages/chat/list",
+			"style": {
+				"navigationBarTitleText": "消息"
+			}
+		},
+		{
+			"path": "pages/chat/room",
+			"style": {
+				"navigationBarTitleText": "聊天"
+			}
+		},
+		{
+			"path": "pages/notification/list",
+			"style": {
+				"navigationBarTitleText": "通知"
+			}
+		},
+		{
+			"path": "pages/user/settings",
+			"style": {
+				"navigationBarTitleText": "设置"
+			}
+		}
+	],
+	"subPackages": [],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#999999",
+		"selectedColor": "#ff6b6b",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"iconPath": "static/tabs/home.png",
+				"selectedIconPath": "static/tabs/home-active.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/cart/index",
+				"iconPath": "static/tabs/cart.png",
+				"selectedIconPath": "static/tabs/cart-active.png",
+				"text": "购物车"
+			},
+			{
+				"pagePath": "pages/chat/list",
+				"iconPath": "static/tabs/chat.png",
+				"selectedIconPath": "static/tabs/chat-active.png",
+				"text": "消息"
+			},
+			{
+				"pagePath": "pages/order/list",
+				"iconPath": "static/tabs/order.png",
+				"selectedIconPath": "static/tabs/order-active.png",
+				"text": "订单"
+			},
+			{
+				"pagePath": "pages/user/index",
+				"iconPath": "static/tabs/user.png",
+				"selectedIconPath": "static/tabs/user-active.png",
+				"text": "我的"
+			}
+		]
+	}
+}

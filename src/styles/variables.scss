@@ -1,0 +1,64 @@
+/* ========== 设计规范 v2.0 - 淘宝风格 ========== */
+
+/* 品牌色 */
+$primary: #ff5000;
+$primary-light: #ff9000;
+$primary-gradient: linear-gradient(90deg, #ff9000 0%, #ff5000 100%);
+
+/* 辅助色 */
+$accent: #ff5000;
+$price: #ff5000;
+$tag-bg: #fff0e6;
+$tag-text: #ff5000;
+
+/* 背景色 */
+$page-bg: #f5f5f5;
+$card-bg: #ffffff;
+$input-bg: #f5f5f5;
+$section-bg: #f7f8fa;
+
+/* 文字色 */
+$text-primary: #000000;
+$text-secondary: #333333;
+$text-tertiary: #666666;
+$text-quaternary: #999999;
+$text-white: #ffffff;
+$text-placeholder: #cccccc;
+
+/* 边框与分割线 */
+$border-color: #eeeeee;
+$divider: #f0f0f0;
+
+/* 阴影 */
+$shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+$shadow-md: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+
+/* 圆角 */
+$radius-sm: 8rpx;
+$radius-md: 12rpx;
+$radius-lg: 16rpx;
+$radius-xl: 24rpx;
+$radius-pill: 60rpx;
+$radius-circle: 50%;
+
+/* 间距 */
+$gap-xs: 8rpx;
+$gap-sm: 12rpx;
+$gap-md: 16rpx;
+$gap-lg: 24rpx;
+$gap-xl: 32rpx;
+
+/* 字号 */
+$font-xs: 20rpx;
+$font-sm: 22rpx;
+$font-base: 24rpx;
+$font-md: 26rpx;
+$font-lg: 28rpx;
+$font-xl: 32rpx;
+$font-xxl: 36rpx;
+$font-price: 32rpx;
+
+/* 安全区 */
+$safe-top: calc(var(--status-bar-height, 44px) + 16rpx);
+$safe-bottom: calc(20rpx + env(safe-area-inset-bottom));
