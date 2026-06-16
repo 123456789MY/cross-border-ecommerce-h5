@@ -189,8 +189,8 @@
     </view>
 
     <!-- 设施详情弹窗 -->
-    <view class="popup-mask" v-show="showFacilityDetailPopup" @click="closeFacilityDetail"></view>
-    <view class="facility-detail-popup-native" v-show="showFacilityDetailPopup" v-if="selectedFacility">
+    <view class="popup-mask" v-if="showFacilityDetailPopup" @click="closeFacilityDetail"></view>
+    <view class="facility-detail-popup-native" v-if="showFacilityDetailPopup && selectedFacility">
       <view class="detail-popup-header">
         <text class="detail-popup-icon">{{ selectedFacility.icon }}</text>
         <text class="detail-popup-title">{{ selectedFacility.name }}</text>
