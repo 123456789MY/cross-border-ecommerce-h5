@@ -23,23 +23,54 @@
           </view>
           <text class="fee-value">{{ formatPrice(orderInfo.feeBreakdown.serviceFee) }}</text>
         </view>
-        <view class="fee-row" v-if="orderInfo.feeBreakdown.inspectionFee > 0">
+        <view class="fee-row" v-if="selectedFees.inspection">
           <text class="fee-label">{{ $t('order.inspectionFee') }}</text>
-          <text class="fee-value">{{ formatPrice(orderInfo.feeBreakdown.inspectionFee) }}</text>
+          <text class="fee-value">{{ formatPrice(inspectionFee) }}</text>
         </view>
-        <view class="fee-row" v-if="orderInfo.feeBreakdown.insuranceFee > 0">
+        <view class="fee-row" v-if="selectedFees.insurance">
           <text class="fee-label">{{ $t('order.insuranceFee') }}</text>
-          <text class="fee-value">{{ formatPrice(orderInfo.feeBreakdown.insuranceFee) }}</text>
+          <text class="fee-value">{{ formatPrice(insuranceFee) }}</text>
         </view>
         <view class="fee-divider"></view>
         <view class="fee-row total-row">
           <text class="fee-label">{{ $t('order.totalPay') }}</text>
-          <text class="fee-value amount">{{ formatPrice(orderInfo.amount) }}</text>
+          <text class="fee-value amount">{{ formatPrice(totalAmount) }}</text>
         </view>
       </view>
       <view class="info-row" v-else>
         <text class="label">{{ $t('pay.orderAmount') }}</text>
         <text class="value amount">{{ formatPrice(orderInfo.amount) }}</text>
+      </view>
+    </view>
+
+    <!-- 可选服务 -->
+    <view class="payment-section" v-if="orderInfo.feeBreakdown">
+      <view class="section-title">{{ $t('order.optionalServices') }}</view>
+      <view class="optional-list">
+        <view class="optional-item" @click="toggleOptionalFee('inspection')">
+          <view class="optional-left">
+            <view class="checkbox" :class="{ checked: selectedFees.inspection }">
+              <text v-if="selectedFees.inspection">✓</text>
+            </view>
+            <view class="optional-info">
+              <text class="optional-name">{{ $t('order.inspectionFee') }}</text>
+              <text class="optional-desc">{{ $t('order.inspectionDesc') }}</text>
+            </view>
+          </view>
+          <text class="optional-price">{{ formatPrice(inspectionFee) }}</text>
+        </view>
+        <view class="optional-item" @click="toggleOptionalFee('insurance')">
+          <view class="optional-left">
+            <view class="checkbox" :class="{ checked: selectedFees.insurance }">
+              <text v-if="selectedFees.insurance">✓</text>
+            </view>
+            <view class="optional-info">
+              <text class="optional-name">{{ $t('order.insuranceFee') }}</text>
+              <text class="optional-desc">{{ $t('order.insuranceDesc') }}</text>
+            </view>
+          </view>
+          <text class="optional-price">{{ formatPrice(insuranceFee) }}</text>
+        </view>
       </view>
     </view>
 
@@ -76,14 +107,14 @@
     <!-- 底部支付按钮 -->
     <view class="bottom-bar">
       <button class="pay-btn" @click="handlePay" :loading="paying">
-        {{ $t('pay.payNow') }} {{ formatPrice(orderInfo.amount) }}
+        {{ $t('pay.payNow') }} {{ formatPrice(totalAmount) }}
       </button>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { onLoad, onUnload } from '@dcloudio/uni-app'
 import { getPaymentParams, queryPaymentStatus } from '@/api/pay'
 
@@ -93,6 +124,22 @@ const orderInfo = ref({
   orderNo: '',
   amount: 0,
   feeBreakdown: null as any,
+})
+
+// 可选费用
+const selectedFees = ref({
+  inspection: false,
+  insurance: false,
+})
+const inspectionFee = 6000
+const insuranceFee = 6000
+
+// 计算总金额
+const totalAmount = computed(() => {
+  let total = orderInfo.value.amount
+  if (selectedFees.value.inspection) total += inspectionFee
+  if (selectedFees.value.insurance) total += insuranceFee
+  return total
 })
 
 // 支付方式
@@ -117,6 +164,11 @@ const formatPrice = (price: number) => {
 // 选择支付方式
 const selectMethod = (method: string) => {
   selectedMethod.value = method
+}
+
+// 切换可选费用
+const toggleOptionalFee = (key: string) => {
+  selectedFees.value[key as keyof typeof selectedFees.value] = !selectedFees.value[key as keyof typeof selectedFees.value]
 }
 
 // 获取订单信息
@@ -417,6 +469,71 @@ onUnload(() => {
     background: #ff5000;
     border-color: #ff5000;
   }
+}
+
+/* 可选服务 */
+.optional-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.optional-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.optional-left {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: #fff;
+
+  &.checked {
+    background: #ff5000;
+    border-color: #ff5000;
+  }
+}
+
+.optional-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.optional-name {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.optional-desc {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
+
+.optional-price {
+  font-size: 28rpx;
+  color: #ff5000;
+  font-weight: bold;
 }
 
 /* 倒计时 */
