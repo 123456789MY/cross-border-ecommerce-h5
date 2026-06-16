@@ -195,7 +195,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
+import { useI18n } from 'vue-i18n'
 import { getServiceFeeConfig, calculateServiceFee, type ServiceFeeConfig } from '@/api/settings'
+
+const { t } = useI18n()
 
 const selectedAddress = ref<any>(null)
 const orderItems = ref<any[]>([])
@@ -232,10 +235,10 @@ const calculatedServiceFee = ref(0)
 const inspectionFee = 6000    // 质检费 6,000₫（约2元人民币）
 const insuranceFee = 6000     // 保险费 6,000₫（约2元人民币）
 
-const optionalFees = [
-  { key: 'inspection', name: $t('order.inspectionFee'), desc: $t('order.inspectionDesc'), price: inspectionFee },
-  { key: 'insurance', name: $t('order.insuranceFee'), desc: $t('order.insuranceDesc'), price: insuranceFee },
-]
+const optionalFees = computed(() => [
+  { key: 'inspection', name: t('order.inspectionFee'), desc: t('order.inspectionDesc'), price: inspectionFee },
+  { key: 'insurance', name: t('order.insuranceFee'), desc: t('order.insuranceDesc'), price: insuranceFee },
+])
 
 // 商品总重量（千克）
 const totalWeight = computed(() => {
