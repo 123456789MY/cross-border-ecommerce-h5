@@ -148,6 +148,41 @@
 			"style": {
 				"navigationBarTitleText": "设置"
 			}
+		},
+		{
+			"path": "pages/coupon/list",
+			"style": {
+				"navigationBarTitleText": "领券中心",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/recharge/index",
+			"style": {
+				"navigationBarTitleText": "充值中心",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/live/list",
+			"style": {
+				"navigationBarTitleText": "直播",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/hotel/index",
+			"style": {
+				"navigationBarTitleText": "酒店预订",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/train/index",
+			"style": {
+				"navigationBarTitleText": "火车票",
+				"navigationStyle": "custom"
+			}
 		}
 	],
 	"subPackages": [],

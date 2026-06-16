@@ -243,6 +243,21 @@ const handleKingKong = (item: any) => {
     case 'secondhand':
       goToSecondhand()
       break
+    case 'coupon':
+      uni.navigateTo({ url: '/pages/coupon/list' })
+      break
+    case 'recharge':
+      uni.navigateTo({ url: '/pages/recharge/index' })
+      break
+    case 'train':
+      uni.navigateTo({ url: '/pages/train/index' })
+      break
+    case 'hotel':
+      uni.navigateTo({ url: '/pages/hotel/index' })
+      break
+    case 'live':
+      uni.navigateTo({ url: '/pages/live/list' })
+      break
     default:
       uni.showToast({ title: `${item.name} 即将上线`, icon: 'none' })
   }
