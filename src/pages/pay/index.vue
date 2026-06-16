@@ -6,7 +6,38 @@
         <text class="label">{{ $t('pay.orderNo') }}</text>
         <text class="value">{{ orderInfo.orderNo }}</text>
       </view>
-      <view class="info-row">
+      <!-- 费用明细 -->
+      <view class="fee-detail" v-if="orderInfo.feeBreakdown">
+        <view class="fee-row">
+          <text class="fee-label">{{ $t('order.goodsTotal') }}</text>
+          <text class="fee-value">{{ formatPrice(orderInfo.feeBreakdown.subtotal) }}</text>
+        </view>
+        <view class="fee-row" v-if="orderInfo.feeBreakdown.shippingFee > 0">
+          <text class="fee-label">{{ $t('order.shippingFee') }}</text>
+          <text class="fee-value">{{ formatPrice(orderInfo.feeBreakdown.shippingFee) }}</text>
+        </view>
+        <view class="fee-row service-fee-row">
+          <view class="fee-left">
+            <text class="fee-label">{{ $t('order.serviceFee') }}</text>
+            <text class="fee-badge">{{ $t('order.required') }}</text>
+          </view>
+          <text class="fee-value">{{ formatPrice(orderInfo.feeBreakdown.serviceFee) }}</text>
+        </view>
+        <view class="fee-row" v-if="orderInfo.feeBreakdown.inspectionFee > 0">
+          <text class="fee-label">{{ $t('order.inspectionFee') }}</text>
+          <text class="fee-value">{{ formatPrice(orderInfo.feeBreakdown.inspectionFee) }}</text>
+        </view>
+        <view class="fee-row" v-if="orderInfo.feeBreakdown.insuranceFee > 0">
+          <text class="fee-label">{{ $t('order.insuranceFee') }}</text>
+          <text class="fee-value">{{ formatPrice(orderInfo.feeBreakdown.insuranceFee) }}</text>
+        </view>
+        <view class="fee-divider"></view>
+        <view class="fee-row total-row">
+          <text class="fee-label">{{ $t('order.totalPay') }}</text>
+          <text class="fee-value amount">{{ formatPrice(orderInfo.amount) }}</text>
+        </view>
+      </view>
+      <view class="info-row" v-else>
         <text class="label">{{ $t('pay.orderAmount') }}</text>
         <text class="value amount">{{ formatPrice(orderInfo.amount) }}</text>
       </view>
@@ -61,6 +92,7 @@ const orderInfo = ref({
   orderId: 0,
   orderNo: '',
   amount: 0,
+  feeBreakdown: null as any,
 })
 
 // 支付方式
@@ -105,7 +137,14 @@ const loadOrderInfo = async (orderId: number) => {
     orderInfo.value = {
       orderId: orderId,
       orderNo: `DD${Date.now()}`,
-      amount: 89000,
+      amount: 296000,
+      feeBreakdown: {
+        subtotal: 243000,
+        shippingFee: 15000,
+        serviceFee: 32000,
+        inspectionFee: 6000,
+        insuranceFee: 0,
+      },
     }
     countdown.value = 15 * 60
     startCountdown()
@@ -239,8 +278,68 @@ onUnload(() => {
 
   .amount {
     font-size: 40rpx;
-    color: #ff6b6b;
+    color: #ff5000;
     font-weight: bold;
+  }
+}
+
+/* 费用明细 */
+.fee-detail {
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.fee-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 0;
+
+  .fee-label {
+    font-size: 26rpx;
+    color: #666;
+  }
+
+  .fee-value {
+    font-size: 26rpx;
+    color: #333;
+
+    &.amount {
+      font-size: 36rpx;
+      color: #ff5000;
+      font-weight: bold;
+    }
+  }
+}
+
+.service-fee-row {
+  .fee-left {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+  }
+
+  .fee-badge {
+    background: #fff0e6;
+    color: #ff5000;
+    font-size: 20rpx;
+    padding: 4rpx 16rpx;
+    border-radius: 30rpx;
+  }
+}
+
+.fee-divider {
+  height: 1rpx;
+  background: #eee;
+  margin: 16rpx 0;
+}
+
+.total-row {
+  .fee-label {
+    font-size: 30rpx;
+    font-weight: bold;
+    color: #000;
   }
 }
 
@@ -315,8 +414,8 @@ onUnload(() => {
   color: #fff;
 
   &.active {
-    background: #ff6b6b;
-    border-color: #ff6b6b;
+    background: #ff5000;
+    border-color: #ff5000;
   }
 }
 
@@ -329,7 +428,7 @@ onUnload(() => {
 }
 
 .countdown {
-  color: #ff6b6b;
+  color: #ff5000;
   font-weight: bold;
   margin-left: 8rpx;
 }
@@ -348,7 +447,7 @@ onUnload(() => {
 }
 
 .pay-btn {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+  background: linear-gradient(90deg, #ff9000 0%, #ff5000 100%);
   color: #fff;
   border: none;
   border-radius: 60rpx;
