@@ -189,8 +189,8 @@
     </view>
 
     <!-- 设施详情弹窗 -->
-    <view class="popup-mask" v-show="showFacilityDetail" @click="closeFacilityDetail"></view>
-    <view class="facility-detail-popup-native" v-show="showFacilityDetail" v-if="selectedFacility">
+    <view class="popup-mask" v-show="showFacilityDetailPopup" @click="closeFacilityDetail"></view>
+    <view class="facility-detail-popup-native" v-show="showFacilityDetailPopup" v-if="selectedFacility">
       <view class="detail-popup-header">
         <text class="detail-popup-icon">{{ selectedFacility.icon }}</text>
         <text class="detail-popup-title">{{ selectedFacility.name }}</text>
@@ -258,7 +258,7 @@ interface Hotel {
 const hotelId = ref('')
 const isFavorite = ref(false)
 const showFacilities = ref(false)
-const showFacilityDetail = ref(false)
+const showFacilityDetailPopup = ref(false)
 const selectedFacility = ref<Facility | null>(null)
 const expandedRooms = ref<boolean[]>([])
 
@@ -530,11 +530,11 @@ function closeFacilities() {
 
 function showFacilityDetail(item: Facility) {
   selectedFacility.value = item
-  showFacilityDetail.value = true
+  showFacilityDetailPopup.value = true
 }
 
 function closeFacilityDetail() {
-  showFacilityDetail.value = false
+  showFacilityDetailPopup.value = false
   selectedFacility.value = null
 }
 
