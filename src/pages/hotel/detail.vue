@@ -40,7 +40,7 @@
       <view class="section-title">设施服务</view>
       <scroll-view class="facilities-scroll" scroll-x="true" show-scrollbar="false">
         <view class="facilities-list">
-          <view class="facility-item" v-for="(item, index) in displayedFacilities" :key="index">
+          <view class="facility-item" v-for="(item, index) in displayedFacilities" :key="index" @click="showFacilityDetail(item)">
             <view class="facility-icon">{{ item.icon }}</view>
             <text class="facility-name">{{ item.name }}</text>
           </view>
@@ -57,22 +57,80 @@
       <view class="section-title">房型列表</view>
       <view class="room-list">
         <view class="room-item" v-for="(room, index) in hotel.rooms" :key="index">
-          <image class="room-image" :src="room.image" mode="aspectFill" />
-          <view class="room-info">
-            <view class="room-name">{{ room.name }}</view>
-            <view class="room-tags">
-              <text class="tag">{{ room.bedType }}</text>
-              <text class="tag">{{ room.area }}㎡</text>
-              <text class="tag">{{ room.window }}</text>
-              <text class="tag" v-if="room.breakfast">含早</text>
-            </view>
-            <view class="room-bottom">
-              <view class="room-price">
-                <text class="price-symbol">¥</text>
-                <text class="price-num">{{ room.price }}</text>
-                <text class="price-unit">/晚</text>
+          <!-- 房型头部：可点击展开 -->
+          <view class="room-header" @click="toggleRoomDetail(index)">
+            <image class="room-image" :src="room.image" mode="aspectFill" />
+            <view class="room-info">
+              <view class="room-name">{{ room.name }}</view>
+              <view class="room-tags">
+                <text class="tag">{{ room.bedType }}</text>
+                <text class="tag">{{ room.area }}㎡</text>
+                <text class="tag">{{ room.window }}</text>
+                <text class="tag" v-if="room.breakfast">含早</text>
               </view>
-              <view class="book-btn" @click="bookRoom(room)">预订</view>
+              <view class="room-meta">
+                <text class="meta-text">{{ room.capacity }} · {{ room.floor }}</text>
+              </view>
+              <view class="room-bottom">
+                <view class="room-price">
+                  <text class="price-symbol">¥</text>
+                  <text class="price-num">{{ room.price }}</text>
+                  <text class="price-unit">/晚</text>
+                </view>
+                <view class="detail-toggle">
+                  <text class="detail-text">{{ expandedRooms[index] ? '收起详情' : '查看详情' }}</text>
+                  <text class="detail-arrow" :class="{ 'arrow-up': expandedRooms[index] }">▼</text>
+                </view>
+              </view>
+            </view>
+          </view>
+
+          <!-- 房型详情展开区 -->
+          <view class="room-detail" v-if="expandedRooms[index]">
+            <!-- 房间图片轮播 -->
+            <view class="room-image-swiper-wrapper">
+              <swiper class="room-image-swiper" :indicator-dots="true" :autoplay="false" circular>
+                <swiper-item v-for="(img, imgIndex) in room.images" :key="imgIndex">
+                  <image class="room-swiper-image" :src="img" mode="aspectFill" />
+                </swiper-item>
+              </swiper>
+            </view>
+
+            <!-- 房间信息 -->
+            <view class="room-detail-info">
+              <view class="detail-row">
+                <text class="detail-label">楼层</text>
+                <text class="detail-value">{{ room.floor }}</text>
+              </view>
+              <view class="detail-row">
+                <text class="detail-label">可住人数</text>
+                <text class="detail-value">{{ room.capacity }}</text>
+              </view>
+              <view class="detail-row">
+                <text class="detail-label">卫浴</text>
+                <text class="detail-value">{{ room.bathroom }}</text>
+              </view>
+            </view>
+
+            <!-- 房间设施 -->
+            <view class="room-facilities">
+              <view class="detail-section-title">房间设施</view>
+              <view class="room-facility-tags">
+                <text class="room-facility-tag" v-for="(fac, fIndex) in room.facilities" :key="fIndex">{{ fac }}</text>
+              </view>
+            </view>
+
+            <!-- 政策信息 -->
+            <view class="room-policies">
+              <view class="detail-section-title">入住政策</view>
+              <text class="policy-text">{{ room.policy }}</text>
+              <view class="detail-section-title" style="margin-top: 16rpx;">退改政策</view>
+              <text class="policy-text">{{ room.cancelPolicy }}</text>
+            </view>
+
+            <!-- 预订按钮 -->
+            <view class="room-detail-book">
+              <view class="book-btn" @click="bookRoom(room)">立即预订</view>
             </view>
           </view>
         </view>
@@ -118,7 +176,7 @@
           <view v-for="(group, gIndex) in facilityGroups" :key="gIndex" class="facility-group">
             <view class="group-title">{{ group.category }}</view>
             <view class="group-list">
-              <view class="popup-facility-item" v-for="(item, index) in group.items" :key="index">
+              <view class="popup-facility-item" v-for="(item, index) in group.items" :key="index" @click="showFacilityDetail(item)">
                 <text class="popup-facility-icon">{{ item.icon }}</text>
                 <view class="popup-facility-info">
                   <text class="popup-facility-name">{{ item.name }}</text>
@@ -128,6 +186,27 @@
             </view>
           </view>
         </scroll-view>
+      </view>
+    </uni-popup>
+
+    <!-- 设施详情弹窗 -->
+    <uni-popup ref="facilityDetailPopup" type="center">
+      <view class="facility-detail-popup" v-if="selectedFacility">
+        <view class="detail-popup-header">
+          <text class="detail-popup-icon">{{ selectedFacility.icon }}</text>
+          <text class="detail-popup-title">{{ selectedFacility.name }}</text>
+          <text class="detail-popup-close" @click="closeFacilityDetail">✕</text>
+        </view>
+        <view class="detail-popup-body">
+          <view class="detail-popup-category">
+            <text class="category-label">分类</text>
+            <text class="category-value">{{ selectedFacility.category }}</text>
+          </view>
+          <view class="detail-popup-desc">
+            <text class="desc-label">详情</text>
+            <text class="desc-value">{{ selectedFacility.desc }}</text>
+          </view>
+        </view>
       </view>
     </uni-popup>
   </view>
@@ -153,6 +232,13 @@ interface Room {
   window: string
   breakfast: boolean
   price: number
+  facilities: string[]
+  policy: string
+  cancelPolicy: string
+  images: string[]
+  floor: string
+  capacity: string
+  bathroom: string
 }
 
 interface Hotel {
@@ -174,6 +260,9 @@ interface Hotel {
 const hotelId = ref('')
 const isFavorite = ref(false)
 const facilitiesPopup = ref<any>(null)
+const facilityDetailPopup = ref<any>(null)
+const selectedFacility = ref<Facility | null>(null)
+const expandedRooms = ref<boolean[]>([])
 
 const hotel = ref<Hotel>({
   id: '',
@@ -247,7 +336,19 @@ const mockHotelData: Record<string, Hotel> = {
         area: 35,
         window: '有窗',
         breakfast: true,
-        price: 688
+        price: 688,
+        facilities: ['空调', '电视', '迷你吧', '保险箱', '吹风机', '浴缸'],
+        policy: '14:00入住，12:00退房',
+        cancelPolicy: '入住当天18:00前可免费取消',
+        images: [
+          'https://picsum.photos/400/260?random=41',
+          'https://picsum.photos/400/260?random=42',
+          'https://picsum.photos/400/260?random=43',
+          'https://picsum.photos/400/260?random=44'
+        ],
+        floor: '5-10层',
+        capacity: '2人',
+        bathroom: '独立卫浴'
       },
       {
         id: 'r2',
@@ -257,7 +358,19 @@ const mockHotelData: Record<string, Hotel> = {
         area: 40,
         window: '有窗',
         breakfast: true,
-        price: 788
+        price: 788,
+        facilities: ['空调', '电视', '迷你吧', '保险箱', '吹风机', '独立淋浴'],
+        policy: '14:00入住，12:00退房',
+        cancelPolicy: '入住当天18:00前可免费取消',
+        images: [
+          'https://picsum.photos/400/260?random=51',
+          'https://picsum.photos/400/260?random=52',
+          'https://picsum.photos/400/260?random=53',
+          'https://picsum.photos/400/260?random=54'
+        ],
+        floor: '11-15层',
+        capacity: '2人',
+        bathroom: '独立卫浴'
       },
       {
         id: 'r3',
@@ -267,7 +380,19 @@ const mockHotelData: Record<string, Hotel> = {
         area: 65,
         window: '湖景',
         breakfast: true,
-        price: 1288
+        price: 1288,
+        facilities: ['空调', '电视', '迷你吧', '保险箱', '吹风机', '浴缸', '客厅', '书房'],
+        policy: '14:00入住，12:00退房',
+        cancelPolicy: '入住前一天18:00前可免费取消',
+        images: [
+          'https://picsum.photos/400/260?random=61',
+          'https://picsum.photos/400/260?random=62',
+          'https://picsum.photos/400/260?random=63',
+          'https://picsum.photos/400/260?random=64'
+        ],
+        floor: '16-20层',
+        capacity: '2人',
+        bathroom: '独立卫浴+浴缸'
       },
       {
         id: 'r4',
@@ -277,7 +402,18 @@ const mockHotelData: Record<string, Hotel> = {
         area: 25,
         window: '有窗',
         breakfast: false,
-        price: 388
+        price: 388,
+        facilities: ['空调', '电视', '吹风机', '独立淋浴'],
+        policy: '14:00入住，12:00退房',
+        cancelPolicy: '入住当天18:00前可免费取消',
+        images: [
+          'https://picsum.photos/400/260?random=71',
+          'https://picsum.photos/400/260?random=72',
+          'https://picsum.photos/400/260?random=73'
+        ],
+        floor: '3-4层',
+        capacity: '1人',
+        bathroom: '独立卫浴'
       }
     ],
     introduction: '杭州西湖希尔顿酒店坐落于风景秀丽的西湖景区，毗邻龙井茶园，环境优美，交通便利。酒店拥有各类豪华客房，配备现代化设施，为您提供舒适惬意的入住体验。',
@@ -315,7 +451,19 @@ const mockHotelData: Record<string, Hotel> = {
         area: 38,
         window: '城景',
         breakfast: false,
-        price: 1588
+        price: 1588,
+        facilities: ['空调', '电视', '迷你吧', '保险箱', '吹风机', '独立淋浴'],
+        policy: '15:00入住，12:00退房',
+        cancelPolicy: '入住前一天18:00前可免费取消',
+        images: [
+          'https://picsum.photos/400/260?random=81',
+          'https://picsum.photos/400/260?random=82',
+          'https://picsum.photos/400/260?random=83',
+          'https://picsum.photos/400/260?random=84'
+        ],
+        floor: '10-20层',
+        capacity: '2人',
+        bathroom: '独立卫浴'
       },
       {
         id: 'r2',
@@ -325,7 +473,19 @@ const mockHotelData: Record<string, Hotel> = {
         area: 45,
         window: '江景',
         breakfast: true,
-        price: 2288
+        price: 2288,
+        facilities: ['空调', '电视', '迷你吧', '保险箱', '吹风机', '浴缸', '智能马桶'],
+        policy: '15:00入住，12:00退房',
+        cancelPolicy: '入住前两天18:00前可免费取消',
+        images: [
+          'https://picsum.photos/400/260?random=91',
+          'https://picsum.photos/400/260?random=92',
+          'https://picsum.photos/400/260?random=93',
+          'https://picsum.photos/400/260?random=94'
+        ],
+        floor: '21-30层',
+        capacity: '2人',
+        bathroom: '独立卫浴+浴缸'
       }
     ],
     introduction: '上海外滩W酒店位于外滩核心地段，拥有绝佳的黄浦江景观。酒店设计时尚前卫，融合上海本土文化元素，是商务出行和休闲度假的理想选择。',
@@ -342,8 +502,10 @@ function loadHotelData() {
   const data = mockHotelData[hotelId.value]
   if (data) {
     hotel.value = data
+    expandedRooms.value = new Array(data.rooms.length).fill(false)
   } else {
     hotel.value = mockHotelData['1']
+    expandedRooms.value = new Array(mockHotelData['1'].rooms.length).fill(false)
   }
 }
 
@@ -366,6 +528,20 @@ function showAllFacilities() {
 
 function closeFacilities() {
   facilitiesPopup.value?.close()
+}
+
+function showFacilityDetail(item: Facility) {
+  selectedFacility.value = item
+  facilityDetailPopup.value?.open()
+}
+
+function closeFacilityDetail() {
+  facilityDetailPopup.value?.close()
+  selectedFacility.value = null
+}
+
+function toggleRoomDetail(index: number) {
+  expandedRooms.value[index] = !expandedRooms.value[index]
 }
 
 function bookRoom(room: Room) {
@@ -579,10 +755,15 @@ function bookNow() {
 
 .room-item {
   display: flex;
+  flex-direction: column;
   background-color: #fafafa;
   border-radius: 12rpx;
   overflow: hidden;
   padding: 16rpx;
+}
+
+.room-header {
+  display: flex;
 }
 
 .room-image {
@@ -621,6 +802,15 @@ function bookNow() {
   border-radius: 8rpx;
 }
 
+.room-meta {
+  margin-top: 8rpx;
+}
+
+.meta-text {
+  font-size: 22rpx;
+  color: #999999;
+}
+
 .room-bottom {
   display: flex;
   align-items: center;
@@ -648,6 +838,115 @@ function bookNow() {
   font-size: 22rpx;
   color: #999999;
   margin-left: 4rpx;
+}
+
+.detail-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.detail-text {
+  font-size: 24rpx;
+  color: #ff5000;
+}
+
+.detail-arrow {
+  font-size: 20rpx;
+  color: #ff5000;
+  transition: transform 0.3s;
+}
+
+.arrow-up {
+  transform: rotate(180deg);
+}
+
+/* 房型详情展开区 */
+.room-detail {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.room-image-swiper-wrapper {
+  margin-bottom: 20rpx;
+}
+
+.room-image-swiper {
+  width: 100%;
+  height: 320rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.room-swiper-image {
+  width: 100%;
+  height: 320rpx;
+}
+
+.room-detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+}
+
+.detail-label {
+  font-size: 26rpx;
+  color: #999999;
+  width: 140rpx;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  font-size: 26rpx;
+  color: #333333;
+  flex: 1;
+}
+
+.detail-section-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 12rpx;
+}
+
+.room-facilities {
+  margin-bottom: 20rpx;
+}
+
+.room-facility-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.room-facility-tag {
+  font-size: 22rpx;
+  color: #ff5000;
+  background-color: #fff0e6;
+  padding: 8rpx 20rpx;
+  border-radius: 8rpx;
+}
+
+.room-policies {
+  margin-bottom: 20rpx;
+}
+
+.policy-text {
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 1.6;
+}
+
+.room-detail-book {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .book-btn {
@@ -825,5 +1124,81 @@ function bookNow() {
   font-size: 24rpx;
   color: #666666;
   line-height: 1.5;
+}
+
+/* 设施详情弹窗 */
+.facility-detail-popup {
+  background-color: #ffffff;
+  border-radius: 24rpx;
+  width: 560rpx;
+  padding: 40rpx;
+}
+
+.detail-popup-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  margin-bottom: 30rpx;
+}
+
+.detail-popup-icon {
+  font-size: 64rpx;
+  margin-bottom: 16rpx;
+}
+
+.detail-popup-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.detail-popup-close {
+  position: absolute;
+  top: -10rpx;
+  right: 0;
+  font-size: 32rpx;
+  color: #999999;
+}
+
+.detail-popup-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.detail-popup-category {
+  display: flex;
+  align-items: center;
+}
+
+.category-label {
+  font-size: 26rpx;
+  color: #999999;
+  width: 100rpx;
+  flex-shrink: 0;
+}
+
+.category-value {
+  font-size: 26rpx;
+  color: #ff5000;
+  font-weight: 500;
+}
+
+.detail-popup-desc {
+  display: flex;
+  flex-direction: column;
+}
+
+.desc-label {
+  font-size: 26rpx;
+  color: #999999;
+  margin-bottom: 8rpx;
+}
+
+.desc-value {
+  font-size: 28rpx;
+  color: #333333;
+  line-height: 1.6;
 }
 </style>
