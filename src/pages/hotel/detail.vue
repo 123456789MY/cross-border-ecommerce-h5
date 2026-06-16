@@ -115,9 +115,17 @@
           <text class="popup-close" @click="closeFacilities">✕</text>
         </view>
         <scroll-view class="popup-body" scroll-y="true">
-          <view class="popup-facility-item" v-for="(item, index) in hotel.facilities" :key="index">
-            <text class="popup-facility-icon">{{ item.icon }}</text>
-            <text class="popup-facility-name">{{ item.name }}</text>
+          <view v-for="(group, gIndex) in facilityGroups" :key="gIndex" class="facility-group">
+            <view class="group-title">{{ group.category }}</view>
+            <view class="group-list">
+              <view class="popup-facility-item" v-for="(item, index) in group.items" :key="index">
+                <text class="popup-facility-icon">{{ item.icon }}</text>
+                <view class="popup-facility-info">
+                  <text class="popup-facility-name">{{ item.name }}</text>
+                  <text class="popup-facility-desc">{{ item.desc }}</text>
+                </view>
+              </view>
+            </view>
           </view>
         </scroll-view>
       </view>
@@ -132,6 +140,8 @@ import { onLoad } from '@dcloudio/uni-app'
 interface Facility {
   name: string
   icon: string
+  desc: string
+  category: string
 }
 
 interface Room {
@@ -183,6 +193,21 @@ const displayedFacilities = computed(() => {
   return hotel.value.facilities.slice(0, 8)
 })
 
+// 设施按分类分组
+const facilityGroups = computed(() => {
+  const groups: Record<string, Facility[]> = {}
+  hotel.value.facilities.forEach(item => {
+    if (!groups[item.category]) {
+      groups[item.category] = []
+    }
+    groups[item.category].push(item)
+  })
+  return Object.keys(groups).map(category => ({
+    category,
+    items: groups[category]
+  }))
+})
+
 // Mock 数据
 const mockHotelData: Record<string, Hotel> = {
   '1': {
@@ -200,18 +225,18 @@ const mockHotelData: Record<string, Hotel> = {
     openYear: 2015,
     renovateYear: 2022,
     facilities: [
-      { name: 'WiFi', icon: '📶' },
-      { name: '停车场', icon: '🅿️' },
-      { name: '餐厅', icon: '🍽️' },
-      { name: '健身房', icon: '💪' },
-      { name: '游泳池', icon: '🏊' },
-      { name: 'SPA', icon: '💆' },
-      { name: '会议室', icon: '📊' },
-      { name: '接送机', icon: '🚗' },
-      { name: '洗衣服务', icon: '👕' },
-      { name: '商务中心', icon: '💼' },
-      { name: '酒吧', icon: '🍸' },
-      { name: '儿童乐园', icon: '🎠' }
+      { name: 'WiFi', icon: '📶', desc: '全酒店覆盖高速无线网络，免费使用', category: '网络' },
+      { name: '停车场', icon: '🅿️', desc: '地下停车场，提供200个车位，住客免费', category: '交通' },
+      { name: '餐厅', icon: '🍽️', desc: '中西餐厅，提供自助早餐和特色菜肴', category: '餐饮' },
+      { name: '健身房', icon: '💪', desc: '24小时开放，配备跑步机、哑铃等器械', category: '休闲' },
+      { name: '游泳池', icon: '🏊', desc: '室内恒温泳池，长25米，开放时间6:00-22:00', category: '休闲' },
+      { name: 'SPA', icon: '💆', desc: '专业按摩师提供全身按摩、面部护理等服务', category: '休闲' },
+      { name: '会议室', icon: '📊', desc: '多功能会议室，可容纳10-200人，配备投影设备', category: '商务' },
+      { name: '接送机', icon: '🚗', desc: '提供机场接送服务，需提前预约', category: '交通' },
+      { name: '洗衣服务', icon: '👕', desc: '提供干洗、湿洗服务，24小时内送回', category: '服务' },
+      { name: '商务中心', icon: '💼', desc: '提供打印、复印、传真等商务服务', category: '商务' },
+      { name: '酒吧', icon: '🍸', desc: '大堂吧提供各类酒水、咖啡和下午茶', category: '餐饮' },
+      { name: '儿童乐园', icon: '🎠', desc: '室内儿童游乐区，配备安全设施', category: '休闲' }
     ],
     rooms: [
       {
@@ -272,14 +297,14 @@ const mockHotelData: Record<string, Hotel> = {
     address: '上海市黄浦区中山东一路',
     openYear: 2017,
     facilities: [
-      { name: 'WiFi', icon: '📶' },
-      { name: '停车场', icon: '🅿️' },
-      { name: '餐厅', icon: '🍽️' },
-      { name: '健身房', icon: '💪' },
-      { name: '游泳池', icon: '🏊' },
-      { name: 'SPA', icon: '💆' },
-      { name: '会议室', icon: '📊' },
-      { name: '酒吧', icon: '🍸' }
+      { name: 'WiFi', icon: '📶', desc: '全酒店覆盖高速无线网络，免费使用', category: '网络' },
+      { name: '停车场', icon: '🅿️', desc: '地下停车场，提供150个车位，住客免费', category: '交通' },
+      { name: '餐厅', icon: '🍽️', desc: '顶层景观餐厅，提供中西式自助早餐', category: '餐饮' },
+      { name: '健身房', icon: '💪', desc: '24小时健身房，配备泰诺健器械', category: '休闲' },
+      { name: '游泳池', icon: '🏊', desc: '无边际泳池，可俯瞰外滩美景', category: '休闲' },
+      { name: 'SPA', icon: '💆', desc: '水疗中心，提供芳香疗法和热石按摩', category: '休闲' },
+      { name: '会议室', icon: '📊', desc: '8间会议室，配备视频会议系统', category: '商务' },
+      { name: '酒吧', icon: '🍸', desc: '屋顶酒吧，夜景绝佳', category: '餐饮' }
     ],
     rooms: [
       {
@@ -750,20 +775,55 @@ function bookNow() {
   max-height: 50vh;
 }
 
+.facility-group {
+  margin-bottom: 24rpx;
+}
+
+.group-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #ff5000;
+  margin-bottom: 16rpx;
+  padding-left: 12rpx;
+  border-left: 6rpx solid #ff5000;
+}
+
+.group-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
 .popup-facility-item {
   display: flex;
-  align-items: center;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
+  align-items: flex-start;
+  padding: 16rpx;
+  background: #fafafa;
+  border-radius: 12rpx;
 }
 
 .popup-facility-icon {
   font-size: 40rpx;
   margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.popup-facility-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .popup-facility-name {
   font-size: 28rpx;
   color: #333333;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.popup-facility-desc {
+  font-size: 24rpx;
+  color: #666666;
+  line-height: 1.5;
 }
 </style>
