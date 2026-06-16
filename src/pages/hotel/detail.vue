@@ -145,6 +145,89 @@
       <view class="surround-text">{{ hotel.surroundInfo }}</view>
     </view>
 
+    <!-- 客户点评 -->
+    <view class="review-card card">
+      <view class="review-header">
+        <view class="section-title">客户点评</view>
+        <view class="review-summary">
+          <text class="review-score">{{ hotel.score }}</text>
+          <text class="review-score-label">分</text>
+          <text class="review-total">（{{ hotel.commentCount }}条评价）</text>
+        </view>
+      </view>
+
+      <!-- 评分维度 -->
+      <view class="rating-dimensions">
+        <view class="rating-item" v-for="dim in ratingDimensions" :key="dim.label">
+          <text class="rating-label">{{ dim.label }}</text>
+          <view class="rating-bar-bg">
+            <view class="rating-bar-fill" :style="{ width: dim.score * 20 + '%' }"></view>
+          </view>
+          <text class="rating-value">{{ dim.score.toFixed(1) }}</text>
+        </view>
+      </view>
+
+      <!-- 标签筛选 -->
+      <view class="review-tags">
+        <view
+          class="review-tag"
+          :class="{ active: reviewFilter === tag }"
+          v-for="tag in reviewTagOptions"
+          :key="tag"
+          @click="reviewFilter = tag"
+        >
+          {{ tag }}
+        </view>
+      </view>
+
+      <!-- 点评列表 -->
+      <view class="review-list">
+        <view class="review-item" v-for="(review, index) in filteredReviews" :key="index">
+          <view class="review-user">
+            <image class="user-avatar" :src="review.avatar" mode="aspectFill" />
+            <view class="user-info">
+              <text class="user-name">{{ review.username }}</text>
+              <view class="user-meta">
+                <text class="review-date">{{ review.date }}</text>
+                <text class="room-type">{{ review.roomType }}</text>
+              </view>
+            </view>
+            <view class="user-score">
+              <text class="user-score-num">{{ review.score }}</text>
+              <text class="user-score-label">分</text>
+            </view>
+          </view>
+          <view class="review-content">{{ review.content }}</view>
+          <view class="review-images" v-if="review.images && review.images.length > 0">
+            <image
+              v-for="(img, imgIdx) in review.images"
+              :key="imgIdx"
+              class="review-img"
+              :src="img"
+              mode="aspectFill"
+              @click="previewReviewImage(img)"
+            />
+          </view>
+          <view class="review-footer">
+            <view class="review-helpful" @click="toggleHelpful(index)">
+              <text class="helpful-icon">{{ review.helpful ? '👍' : '👍' }}</text>
+              <text class="helpful-count">{{ review.helpfulCount }}</text>
+            </view>
+            <view class="review-reply" v-if="review.reply">
+              <text class="reply-label">酒店回复：</text>
+              <text class="reply-text">{{ review.reply }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 查看更多 -->
+      <view class="review-more" @click="loadMoreReviews" v-if="hasMoreReviews">
+        <text class="more-text">查看更多点评</text>
+        <text class="more-arrow">▼</text>
+      </view>
+    </view>
+
     <!-- 底部占位 -->
     <view class="bottom-placeholder"></view>
 
@@ -509,6 +592,145 @@ function loadHotelData() {
 
 function goBack() {
   uni.navigateBack()
+}
+
+// ==================== 客户点评 ====================
+interface Review {
+  username: string
+  avatar: string
+  date: string
+  roomType: string
+  score: number
+  content: string
+  images: string[]
+  helpful: boolean
+  helpfulCount: number
+  reply: string
+  tags: string[]
+}
+
+const ratingDimensions = ref([
+  { label: '环境', score: 4.8 },
+  { label: '服务', score: 4.9 },
+  { label: '卫生', score: 4.7 },
+  { label: '设施', score: 4.6 },
+  { label: '位置', score: 4.8 },
+])
+
+const reviewTagOptions = ['全部', '好评', '有图', '差评', '最新']
+
+const reviewFilter = ref('全部')
+
+const allReviews = ref<Review[]>([
+  {
+    username: '旅行达人小王',
+    avatar: '/static/hotel/review_avatar_1.jpg',
+    date: '2026-06-15',
+    roomType: '豪华大床房',
+    score: 5.0,
+    content: '酒店环境非常好，房间宽敞明亮，窗外就是西湖美景。服务态度很热情，前台小姐姐特别耐心地给我们介绍了周边的美食和景点。早餐种类丰富，中西式都有，味道也很不错。唯一的小遗憾是泳池人有点多，不过整体体验非常满意，下次还会再来！',
+    images: ['/static/hotel/room1_1.jpg', '/static/hotel/hotel1_pool.jpg'],
+    helpful: false,
+    helpfulCount: 128,
+    reply: '感谢您的五星好评！很高兴您对酒店环境和服务满意，期待您的再次光临。泳池高峰期建议避开10:00-12:00时段，体验会更好哦~',
+    tags: ['好评', '有图'],
+  },
+  {
+    username: '出差党老李',
+    avatar: '/static/hotel/review_avatar_2.jpg',
+    date: '2026-06-12',
+    roomType: '行政双床房',
+    score: 4.5,
+    content: '出差入住的，位置很方便，离地铁站步行5分钟。房间干净整洁，办公桌够大，WiFi速度快，适合办公。早餐虽然丰富但中式菜品偏少。隔音效果一般，走廊声音能听到。总体性价比不错。',
+    images: ['/static/hotel/room2_3.jpg'],
+    helpful: false,
+    helpfulCount: 56,
+    reply: '感谢您的中肯评价！我们已将中式早餐的建议反馈给餐饮部，会尽快丰富菜品。关于隔音问题，我们正在升级隔音设施，给您带来不便敬请谅解。',
+    tags: ['好评'],
+  },
+  {
+    username: '度假小仙女',
+    avatar: '/static/hotel/review_avatar_3.jpg',
+    date: '2026-06-10',
+    roomType: '湖景套房',
+    score: 5.0,
+    content: '太美了！湖景套房的景色简直绝了，早上拉开窗帘就能看到西湖日出，太浪漫了！房间面积很大，客厅和卧室分开，浴室有浴缸可以泡澡看湖景。SPA也很推荐，技师手法专业。唯一缺点是价格略贵，但绝对物超所值！',
+    images: ['/static/hotel/room3_1.jpg', '/static/hotel/room3_2.jpg', '/static/hotel/room3_3.jpg'],
+    helpful: false,
+    helpfulCount: 234,
+    reply: '非常感谢您的热情分享！湖景套房确实是我们酒店的明星房型，能看到西湖日出是很多客人的最爱。期待您下次带着家人一起来体验！',
+    tags: ['好评', '有图'],
+  },
+  {
+    username: '背包客小张',
+    avatar: '/static/hotel/review_avatar_4.jpg',
+    date: '2026-06-08',
+    roomType: '标准单人房',
+    score: 3.5,
+    content: '房间比较小，床也不太舒服，枕头太软了。窗户对着停车场，有点吵。热水供应不稳定，晚上洗澡水温忽冷忽热。位置还可以，离景区不远。这个价位只能说一般般吧。',
+    images: [],
+    helpful: false,
+    helpfulCount: 23,
+    reply: '非常抱歉给您带来了不好的入住体验。关于热水和枕头的问题，我们已安排工程部和客房部检查整改。如需更换枕头类型，可随时联系前台，我们有多种枕头可供选择。',
+    tags: ['差评'],
+  },
+  {
+    username: '亲子游妈妈',
+    avatar: '/static/hotel/review_avatar_5.jpg',
+    date: '2026-06-05',
+    roomType: '豪华大床房',
+    score: 4.8,
+    content: '带孩子来度假的，酒店对小朋友很友好，有儿童拖鞋和牙刷。泳池有儿童专区，安全员也很负责。周边景点多，步行就能到西湖。早餐有儿童餐区，孩子很喜欢。唯一建议是能增加一些亲子活动就更好了。',
+    images: ['/static/hotel/hotel1_pool.jpg'],
+    helpful: false,
+    helpfulCount: 89,
+    reply: '感谢您的建议！我们正在筹备亲子活动项目，预计下个月就会推出周末亲子手工课和户外探索活动，敬请期待！',
+    tags: ['好评', '有图'],
+  },
+  {
+    username: '商务人士陈总',
+    avatar: '/static/hotel/review_avatar_6.jpg',
+    date: '2026-06-01',
+    roomType: '湖景套房',
+    score: 4.9,
+    content: '接待客户选的这家酒店，果然没让我失望。湖景套房气派大方，客厅适合小规模商务会谈。会议室设备齐全，服务周到。晚上的湖景夜景也很美，客户非常满意。推荐商务接待使用。',
+    images: ['/static/hotel/room3_4.jpg'],
+    helpful: false,
+    helpfulCount: 167,
+    reply: '感谢您的认可和推荐！我们的商务中心提供专业的会议服务，如需定制商务接待方案，欢迎提前联系我们的VIP管家。',
+    tags: ['好评', '有图'],
+  },
+])
+
+const displayReviewCount = ref(3)
+const hasMoreReviews = computed(() => displayReviewCount.value < allReviews.value.length)
+
+const filteredReviews = computed(() => {
+  let list = allReviews.value
+  if (reviewFilter.value === '好评') {
+    list = list.filter(r => r.score >= 4.5)
+  } else if (reviewFilter.value === '差评') {
+    list = list.filter(r => r.score < 4.0)
+  } else if (reviewFilter.value === '有图') {
+    list = list.filter(r => r.images.length > 0)
+  } else if (reviewFilter.value === '最新') {
+    list = [...list].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  }
+  return list.slice(0, displayReviewCount.value)
+})
+
+function toggleHelpful(index: number) {
+  const review = allReviews.value[index]
+  review.helpful = !review.helpful
+  review.helpfulCount += review.helpful ? 1 : -1
+}
+
+function loadMoreReviews() {
+  displayReviewCount.value = allReviews.value.length
+}
+
+function previewReviewImage(url: string) {
+  uni.previewImage({ urls: [url] })
 }
 
 function openMap() {
@@ -1220,5 +1442,266 @@ function bookNow() {
   font-size: 28rpx;
   color: #333333;
   line-height: 1.6;
+}
+
+/* ==================== 客户点评 ==================== */
+.review-card {
+  margin-top: 20rpx;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.review-summary {
+  display: flex;
+  align-items: baseline;
+}
+
+.review-score {
+  font-size: 48rpx;
+  color: #ff5000;
+  font-weight: bold;
+}
+
+.review-score-label {
+  font-size: 24rpx;
+  color: #ff5000;
+  margin-left: 4rpx;
+}
+
+.review-total {
+  font-size: 24rpx;
+  color: #999;
+  margin-left: 8rpx;
+}
+
+/* 评分维度 */
+.rating-dimensions {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+  padding: 24rpx;
+  background: #fafafa;
+  border-radius: 12rpx;
+}
+
+.rating-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.rating-label {
+  font-size: 26rpx;
+  color: #666;
+  width: 60rpx;
+  flex-shrink: 0;
+}
+
+.rating-bar-bg {
+  flex: 1;
+  height: 12rpx;
+  background: #e8e8e8;
+  border-radius: 6rpx;
+  overflow: hidden;
+}
+
+.rating-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff9000, #ff5000);
+  border-radius: 6rpx;
+  transition: width 0.3s;
+}
+
+.rating-value {
+  font-size: 26rpx;
+  color: #ff5000;
+  font-weight: bold;
+  width: 60rpx;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* 标签筛选 */
+.review-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.review-tag {
+  padding: 12rpx 28rpx;
+  background: #f5f5f5;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.review-tag.active {
+  background: linear-gradient(90deg, #ff9000, #ff5000);
+  color: #fff;
+  font-weight: 500;
+}
+
+/* 点评列表 */
+.review-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.review-item {
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.review-item:last-child {
+  border-bottom: none;
+}
+
+.review-user {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.user-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.user-meta {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 4rpx;
+}
+
+.review-date {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.room-type {
+  font-size: 22rpx;
+  color: #ff5000;
+  background: #fff2e8;
+  padding: 2rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.user-score {
+  display: flex;
+  align-items: baseline;
+  flex-shrink: 0;
+}
+
+.user-score-num {
+  font-size: 36rpx;
+  color: #ff5000;
+  font-weight: bold;
+}
+
+.user-score-label {
+  font-size: 20rpx;
+  color: #ff5000;
+}
+
+.review-content {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.8;
+  margin-bottom: 16rpx;
+}
+
+.review-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.review-img {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 12rpx;
+}
+
+.review-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.review-helpful {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 0;
+}
+
+.helpful-icon {
+  font-size: 28rpx;
+}
+
+.helpful-count {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.review-reply {
+  background: #f8f8f8;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  border-left: 6rpx solid #ff5000;
+}
+
+.reply-label {
+  font-size: 26rpx;
+  color: #ff5000;
+  font-weight: 500;
+}
+
+.reply-text {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 查看更多 */
+.review-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx 0;
+  gap: 8rpx;
+}
+
+.more-text {
+  font-size: 28rpx;
+  color: #ff5000;
+}
+
+.more-arrow {
+  font-size: 22rpx;
+  color: #ff5000;
 }
 </style>
