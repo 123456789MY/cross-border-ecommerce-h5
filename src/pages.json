@@ -178,6 +178,13 @@
 			}
 		},
 		{
+			"path": "pages/hotel/detail",
+			"style": {
+				"navigationBarTitleText": "酒店详情",
+				"navigationStyle": "custom"
+			}
+		},
+		{
 			"path": "pages/train/index",
 			"style": {
 				"navigationBarTitleText": "火车票",
