@@ -65,6 +65,7 @@
     "paymentMethod": "支付方式",
     "optionalServices": "可选服务",
     "feeDetail": "费用明细",
+    "goodsList": "商品信息",
     "goodsTotal": "商品总价",
     "shippingFee": "运费",
     "serviceFee": "服务费",
