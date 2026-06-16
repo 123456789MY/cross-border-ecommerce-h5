@@ -3,7 +3,13 @@
     <!-- 顶部固定搜索区 -->
     <view class="header-fixed">
       <view class="header-gradient">
-        <view class="header-title">酒店预订</view>
+        <view class="header-nav">
+          <view class="back-btn" @click="goBack">
+            <text class="back-icon">&lt;</text>
+          </view>
+          <view class="header-title">酒店预订</view>
+          <view class="header-placeholder"></view>
+        </view>
       </view>
 
       <!-- 搜索卡片 -->
@@ -885,6 +891,14 @@ const goDetail = (id: number) => {
     url: `/pages/hotel/detail?id=${id}`,
   })
 }
+
+const goBack = () => {
+  uni.navigateBack({
+    fail: () => {
+      uni.switchTab({ url: '/pages/index/index' })
+    }
+  })
+}
 </script>
 
 <style scoped>
@@ -906,6 +920,30 @@ const goDetail = (id: number) => {
   background: linear-gradient(90deg, #ff9000 0%, #ff5000 100%);
   padding: 60rpx 32rpx 80rpx;
   border-radius: 0 0 32rpx 32rpx;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.back-btn {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-icon {
+  font-size: 36rpx;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.header-placeholder {
+  width: 64rpx;
 }
 
 .header-title {
