@@ -319,7 +319,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 1,
     name: '北京王府半岛酒店',
-    image: 'https://picsum.photos/400/300?random=1',
+    image: '/static/hotel/hotel_list_1.jpg',
     rating: 4.9,
     price: 1288,
     location: '王府井大街8号',
@@ -331,7 +331,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 2,
     name: '上海外滩华尔道夫酒店',
-    image: 'https://picsum.photos/400/300?random=2',
+    image: '/static/hotel/hotel_list_2.jpg',
     rating: 4.8,
     price: 1588,
     location: '中山东一路2号',
@@ -343,7 +343,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 3,
     name: '广州四季酒店',
-    image: 'https://picsum.photos/400/300?random=3',
+    image: '/static/hotel/hotel_list_3.jpg',
     rating: 4.9,
     price: 998,
     location: '珠江新城珠江西路5号',
@@ -355,7 +355,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 4,
     name: '深圳瑞吉酒店',
-    image: 'https://picsum.photos/400/300?random=4',
+    image: '/static/hotel/hotel_list_4.jpg',
     rating: 4.7,
     price: 888,
     location: '罗湖区深南东路5016号',
@@ -367,7 +367,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 5,
     name: '杭州西湖国宾馆',
-    image: 'https://picsum.photos/400/300?random=5',
+    image: '/static/hotel/hotel_list_5.jpg',
     rating: 4.8,
     price: 688,
     location: '西湖区杨公堤18号',
@@ -379,7 +379,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 6,
     name: '成都博舍酒店',
-    image: 'https://picsum.photos/400/300?random=6',
+    image: '/static/hotel/hotel_list_6.jpg',
     rating: 4.9,
     price: 1188,
     location: '锦江区笔帖式街81号',
@@ -391,7 +391,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 7,
     name: '西安索菲特传奇酒店',
-    image: 'https://picsum.photos/400/300?random=7',
+    image: '/static/hotel/hotel_list_7.jpg',
     rating: 4.8,
     price: 768,
     location: '新城区东新街319号',
@@ -403,7 +403,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 8,
     name: '三亚亚特兰蒂斯酒店',
-    image: 'https://picsum.photos/400/300?random=8',
+    image: '/static/hotel/hotel_list_8.jpg',
     rating: 4.7,
     price: 1888,
     location: '海棠区海棠北路36号',
@@ -415,7 +415,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 9,
     name: '厦门康莱德酒店',
-    image: 'https://picsum.photos/400/300?random=9',
+    image: '/static/hotel/hotel_list_9.jpg',
     rating: 4.8,
     price: 868,
     location: '思明区演武西路186号',
@@ -427,7 +427,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 10,
     name: '昆明翠湖宾馆',
-    image: 'https://picsum.photos/400/300?random=10',
+    image: '/static/hotel/hotel_list_10.jpg',
     rating: 4.5,
     price: 368,
     location: '五华区翠湖南路6号',
@@ -439,7 +439,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 11,
     name: '北京如家精选酒店',
-    image: 'https://picsum.photos/400/300?random=11',
+    image: '/static/hotel/hotel_list_11.jpg',
     rating: 4.3,
     price: 298,
     location: '朝阳区建国路88号',
@@ -451,7 +451,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 12,
     name: '上海全季酒店',
-    image: 'https://picsum.photos/400/300?random=12',
+    image: '/static/hotel/hotel_list_12.jpg',
     rating: 4.4,
     price: 358,
     location: '浦东新区陆家嘴环路1000号',
@@ -463,7 +463,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 13,
     name: '广州花园酒店',
-    image: 'https://picsum.photos/400/300?random=13',
+    image: '/static/hotel/hotel_list_13.jpg',
     rating: 4.6,
     price: 528,
     location: '越秀区环市东路368号',
@@ -475,7 +475,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 14,
     name: '深圳华侨城洲际酒店',
-    image: 'https://picsum.photos/400/300?random=14',
+    image: '/static/hotel/hotel_list_14.jpg',
     rating: 4.7,
     price: 698,
     location: '南山区华侨城深南大道9009号',
@@ -487,7 +487,7 @@ const allHotels = ref<Hotel[]>([
   {
     id: 15,
     name: '杭州法云安缦',
-    image: 'https://picsum.photos/400/300?random=15',
+    image: '/static/hotel/hotel_list_15.jpg',
     rating: 4.9,
     price: 4588,
     location: '西湖区西湖街道法云弄22号',

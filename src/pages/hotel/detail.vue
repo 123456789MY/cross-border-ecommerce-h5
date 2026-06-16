@@ -301,9 +301,9 @@ const mockHotelData: Record<string, Hotel> = {
     id: '1',
     name: '杭州西湖希尔顿酒店',
     images: [
-      'https://picsum.photos/400/300?random=1',
-      'https://picsum.photos/400/300?random=2',
-      'https://picsum.photos/400/300?random=3'
+      '/static/hotel/hotel1_cover.jpg',
+      '/static/hotel/hotel1_lobby.jpg',
+      '/static/hotel/hotel1_pool.jpg'
     ],
     stars: 5,
     score: 4.8,
@@ -329,7 +329,7 @@ const mockHotelData: Record<string, Hotel> = {
       {
         id: 'r1',
         name: '豪华大床房',
-        image: 'https://picsum.photos/200/150?random=4',
+        image: '/static/hotel/room1_1.jpg',
         bedType: '大床',
         area: 35,
         window: '有窗',
@@ -339,10 +339,10 @@ const mockHotelData: Record<string, Hotel> = {
         policy: '14:00入住，12:00退房',
         cancelPolicy: '入住当天18:00前可免费取消',
         images: [
-          'https://picsum.photos/400/260?random=41',
-          'https://picsum.photos/400/260?random=42',
-          'https://picsum.photos/400/260?random=43',
-          'https://picsum.photos/400/260?random=44'
+          '/static/hotel/room1_1.jpg',
+          '/static/hotel/room1_2.jpg',
+          '/static/hotel/room1_3.jpg',
+          '/static/hotel/room1_4.jpg'
         ],
         floor: '5-10层',
         capacity: '2人',
@@ -351,7 +351,7 @@ const mockHotelData: Record<string, Hotel> = {
       {
         id: 'r2',
         name: '行政双床房',
-        image: 'https://picsum.photos/200/150?random=5',
+        image: '/static/hotel/room2_1.jpg',
         bedType: '双床',
         area: 40,
         window: '有窗',
@@ -361,10 +361,10 @@ const mockHotelData: Record<string, Hotel> = {
         policy: '14:00入住，12:00退房',
         cancelPolicy: '入住当天18:00前可免费取消',
         images: [
-          'https://picsum.photos/400/260?random=51',
-          'https://picsum.photos/400/260?random=52',
-          'https://picsum.photos/400/260?random=53',
-          'https://picsum.photos/400/260?random=54'
+          '/static/hotel/room2_1.jpg',
+          '/static/hotel/room2_2.jpg',
+          '/static/hotel/room2_3.jpg',
+          '/static/hotel/room2_4.jpg'
         ],
         floor: '11-15层',
         capacity: '2人',
@@ -373,7 +373,7 @@ const mockHotelData: Record<string, Hotel> = {
       {
         id: 'r3',
         name: '湖景套房',
-        image: 'https://picsum.photos/200/150?random=6',
+        image: '/static/hotel/room3_1.jpg',
         bedType: '大床',
         area: 65,
         window: '湖景',
@@ -383,10 +383,10 @@ const mockHotelData: Record<string, Hotel> = {
         policy: '14:00入住，12:00退房',
         cancelPolicy: '入住前一天18:00前可免费取消',
         images: [
-          'https://picsum.photos/400/260?random=61',
-          'https://picsum.photos/400/260?random=62',
-          'https://picsum.photos/400/260?random=63',
-          'https://picsum.photos/400/260?random=64'
+          '/static/hotel/room3_1.jpg',
+          '/static/hotel/room3_2.jpg',
+          '/static/hotel/room3_3.jpg',
+          '/static/hotel/room3_4.jpg'
         ],
         floor: '16-20层',
         capacity: '2人',
@@ -395,7 +395,7 @@ const mockHotelData: Record<string, Hotel> = {
       {
         id: 'r4',
         name: '标准单人房',
-        image: 'https://picsum.photos/200/150?random=7',
+        image: '/static/hotel/room4_1.jpg',
         bedType: '单人床',
         area: 25,
         window: '有窗',
@@ -405,9 +405,9 @@ const mockHotelData: Record<string, Hotel> = {
         policy: '14:00入住，12:00退房',
         cancelPolicy: '入住当天18:00前可免费取消',
         images: [
-          'https://picsum.photos/400/260?random=71',
-          'https://picsum.photos/400/260?random=72',
-          'https://picsum.photos/400/260?random=73'
+          '/static/hotel/room4_1.jpg',
+          '/static/hotel/room4_2.jpg',
+          '/static/hotel/room4_3.jpg'
         ],
         floor: '3-4层',
         capacity: '1人',
@@ -421,9 +421,9 @@ const mockHotelData: Record<string, Hotel> = {
     id: '2',
     name: '上海外滩W酒店',
     images: [
-      'https://picsum.photos/400/300?random=8',
-      'https://picsum.photos/400/300?random=9',
-      'https://picsum.photos/400/300?random=10'
+      '/static/hotel/hotel2_cover.jpg',
+      '/static/hotel/hotel2_lobby.jpg',
+      '/static/hotel/hotel2_view.jpg'
     ],
     stars: 5,
     score: 4.9,
@@ -444,7 +444,7 @@ const mockHotelData: Record<string, Hotel> = {
       {
         id: 'r1',
         name: '奇妙客房',
-        image: 'https://picsum.photos/200/150?random=11',
+        image: '/static/hotel/room5_1.jpg',
         bedType: '大床',
         area: 38,
         window: '城景',
@@ -454,10 +454,10 @@ const mockHotelData: Record<string, Hotel> = {
         policy: '15:00入住，12:00退房',
         cancelPolicy: '入住前一天18:00前可免费取消',
         images: [
-          'https://picsum.photos/400/260?random=81',
-          'https://picsum.photos/400/260?random=82',
-          'https://picsum.photos/400/260?random=83',
-          'https://picsum.photos/400/260?random=84'
+          '/static/hotel/room5_1.jpg',
+          '/static/hotel/room5_2.jpg',
+          '/static/hotel/room5_3.jpg',
+          '/static/hotel/room5_4.jpg'
         ],
         floor: '10-20层',
         capacity: '2人',
@@ -466,7 +466,7 @@ const mockHotelData: Record<string, Hotel> = {
       {
         id: 'r2',
         name: '外滩景观房',
-        image: 'https://picsum.photos/200/150?random=12',
+        image: '/static/hotel/room6_1.jpg',
         bedType: '大床',
         area: 45,
         window: '江景',
@@ -476,10 +476,10 @@ const mockHotelData: Record<string, Hotel> = {
         policy: '15:00入住，12:00退房',
         cancelPolicy: '入住前两天18:00前可免费取消',
         images: [
-          'https://picsum.photos/400/260?random=91',
-          'https://picsum.photos/400/260?random=92',
-          'https://picsum.photos/400/260?random=93',
-          'https://picsum.photos/400/260?random=94'
+          '/static/hotel/room6_1.jpg',
+          '/static/hotel/room6_2.jpg',
+          '/static/hotel/room6_3.jpg',
+          '/static/hotel/room6_4.jpg'
         ],
         floor: '21-30层',
         capacity: '2人',
