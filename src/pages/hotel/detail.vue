@@ -166,49 +166,47 @@
     </view>
 
     <!-- 全部设施弹窗 -->
-    <uni-popup ref="facilitiesPopup" type="bottom">
-      <view class="facilities-popup">
-        <view class="popup-header">
-          <text class="popup-title">全部设施</text>
-          <text class="popup-close" @click="closeFacilities">✕</text>
-        </view>
-        <scroll-view class="popup-body" scroll-y="true">
-          <view v-for="(group, gIndex) in facilityGroups" :key="gIndex" class="facility-group">
-            <view class="group-title">{{ group.category }}</view>
-            <view class="group-list">
-              <view class="popup-facility-item" v-for="(item, index) in group.items" :key="index" @click="showFacilityDetail(item)">
-                <text class="popup-facility-icon">{{ item.icon }}</text>
-                <view class="popup-facility-info">
-                  <text class="popup-facility-name">{{ item.name }}</text>
-                  <text class="popup-facility-desc">{{ item.desc }}</text>
-                </view>
+    <view class="popup-mask" v-show="showFacilities" @click="closeFacilities"></view>
+    <view class="facilities-popup-native" v-show="showFacilities">
+      <view class="popup-header">
+        <text class="popup-title">全部设施</text>
+        <text class="popup-close" @click="closeFacilities">✕</text>
+      </view>
+      <scroll-view class="popup-body" scroll-y="true">
+        <view v-for="(group, gIndex) in facilityGroups" :key="gIndex" class="facility-group">
+          <view class="group-title">{{ group.category }}</view>
+          <view class="group-list">
+            <view class="popup-facility-item" v-for="(item, index) in group.items" :key="index" @click="showFacilityDetail(item)">
+              <text class="popup-facility-icon">{{ item.icon }}</text>
+              <view class="popup-facility-info">
+                <text class="popup-facility-name">{{ item.name }}</text>
+                <text class="popup-facility-desc">{{ item.desc }}</text>
               </view>
             </view>
           </view>
-        </scroll-view>
-      </view>
-    </uni-popup>
+        </view>
+      </scroll-view>
+    </view>
 
     <!-- 设施详情弹窗 -->
-    <uni-popup ref="facilityDetailPopup" type="center">
-      <view class="facility-detail-popup" v-if="selectedFacility">
-        <view class="detail-popup-header">
-          <text class="detail-popup-icon">{{ selectedFacility.icon }}</text>
-          <text class="detail-popup-title">{{ selectedFacility.name }}</text>
-          <text class="detail-popup-close" @click="closeFacilityDetail">✕</text>
+    <view class="popup-mask" v-show="showFacilityDetail" @click="closeFacilityDetail"></view>
+    <view class="facility-detail-popup-native" v-show="showFacilityDetail" v-if="selectedFacility">
+      <view class="detail-popup-header">
+        <text class="detail-popup-icon">{{ selectedFacility.icon }}</text>
+        <text class="detail-popup-title">{{ selectedFacility.name }}</text>
+        <text class="detail-popup-close" @click="closeFacilityDetail">✕</text>
+      </view>
+      <view class="detail-popup-body">
+        <view class="detail-popup-category">
+          <text class="category-label">分类</text>
+          <text class="category-value">{{ selectedFacility.category }}</text>
         </view>
-        <view class="detail-popup-body">
-          <view class="detail-popup-category">
-            <text class="category-label">分类</text>
-            <text class="category-value">{{ selectedFacility.category }}</text>
-          </view>
-          <view class="detail-popup-desc">
-            <text class="desc-label">详情</text>
-            <text class="desc-value">{{ selectedFacility.desc }}</text>
-          </view>
+        <view class="detail-popup-desc">
+          <text class="desc-label">详情</text>
+          <text class="desc-value">{{ selectedFacility.desc }}</text>
         </view>
       </view>
-    </uni-popup>
+    </view>
   </view>
 </template>
 
@@ -259,8 +257,8 @@ interface Hotel {
 
 const hotelId = ref('')
 const isFavorite = ref(false)
-const facilitiesPopup = ref<any>(null)
-const facilityDetailPopup = ref<any>(null)
+const showFacilities = ref(false)
+const showFacilityDetail = ref(false)
 const selectedFacility = ref<Facility | null>(null)
 const expandedRooms = ref<boolean[]>([])
 
@@ -523,20 +521,20 @@ function openMap() {
 }
 
 function showAllFacilities() {
-  facilitiesPopup.value?.open()
+  showFacilities.value = true
 }
 
 function closeFacilities() {
-  facilitiesPopup.value?.close()
+  showFacilities.value = false
 }
 
 function showFacilityDetail(item: Facility) {
   selectedFacility.value = item
-  facilityDetailPopup.value?.open()
+  showFacilityDetail.value = true
 }
 
 function closeFacilityDetail() {
-  facilityDetailPopup.value?.close()
+  showFacilityDetail.value = false
   selectedFacility.value = null
 }
 
@@ -1039,12 +1037,27 @@ function bookNow() {
 }
 
 /* 弹窗 */
-.facilities-popup {
+.popup-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+}
+
+.facilities-popup-native {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: #ffffff;
   border-radius: 24rpx 24rpx 0 0;
-  max-height: 60vh;
+  max-height: 70vh;
   display: flex;
   flex-direction: column;
+  z-index: 999;
 }
 
 .popup-header {
@@ -1127,11 +1140,16 @@ function bookNow() {
 }
 
 /* 设施详情弹窗 */
-.facility-detail-popup {
+.facility-detail-popup-native {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background-color: #ffffff;
   border-radius: 24rpx;
   width: 560rpx;
   padding: 40rpx;
+  z-index: 999;
 }
 
 .detail-popup-header {
