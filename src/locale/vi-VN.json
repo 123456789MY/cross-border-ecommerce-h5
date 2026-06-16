@@ -70,6 +70,8 @@
     "serviceFee": "Phí dịch vụ",
     "inspectionFee": "Phí kiểm định",
     "insuranceFee": "Phí bảo hiểm",
+    "inspectionDesc": "Dịch vụ kiểm tra chất lượng",
+    "insuranceDesc": "Bảo hiểm đền bù hư hỏng",
     "totalPay": "Tổng thanh toán",
     "required": "Bắt buộc",
     "feeType": "Cách tính phí",

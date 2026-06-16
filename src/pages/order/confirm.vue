@@ -229,12 +229,12 @@ const serviceFeeConfig = ref<ServiceFeeConfig | null>(null)
 const calculatedServiceFee = ref(0)
 
 // 质检费、保险费（固定金额）
-const inspectionFee = 15000   // 质检费 15,000₫
-const insuranceFee = 10000    // 保险费 10,000₫
+const inspectionFee = 6000    // 质检费 6,000₫（约2元人民币）
+const insuranceFee = 6000     // 保险费 6,000₫（约2元人民币）
 
 const optionalFees = [
-  { key: 'inspection', name: '质检费', desc: '商品质量检测', price: inspectionFee },
-  { key: 'insurance', name: '保险费', desc: '运输损坏赔偿', price: insuranceFee },
+  { key: 'inspection', name: $t('order.inspectionFee'), desc: $t('order.inspectionDesc'), price: inspectionFee },
+  { key: 'insurance', name: $t('order.insuranceFee'), desc: $t('order.insuranceDesc'), price: insuranceFee },
 ]
 
 // 商品总重量（千克）

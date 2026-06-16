@@ -70,6 +70,8 @@
     "serviceFee": "服务费",
     "inspectionFee": "质检费",
     "insuranceFee": "保险费",
+    "inspectionDesc": "商品质量检测服务",
+    "insuranceDesc": "运输损坏赔偿保障",
     "totalPay": "实付金额",
     "required": "必选",
     "feeType": "计费方式",
