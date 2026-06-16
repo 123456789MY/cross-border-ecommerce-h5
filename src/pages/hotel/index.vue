@@ -59,11 +59,13 @@
             关键词
           </view>
           <input
-            v-model="searchForm.keyword"
-            class="keyword-input"
-            placeholder="酒店名/位置/品牌"
-            placeholder-class="keyword-placeholder"
-          />
+          v-model="searchForm.keyword"
+          class="keyword-input"
+          placeholder="酒店名/位置/品牌"
+          placeholder-class="keyword-placeholder"
+          @input="onKeywordInput"
+          @confirm="onSearch"
+        />
         </view>
 
         <!-- 搜索按钮 -->
@@ -239,6 +241,56 @@
         </view>
       </view>
     </view>
+
+    <!-- 日期选择器 -->
+    <view v-if="showDatePicker" class="filter-panel-mask" @click="closeDatePicker">
+      <view class="date-picker-panel" @click.stop>
+        <view class="panel-header">
+          <text class="panel-title">选择{{ datePickerType === 'checkIn' ? '入住' : '离店' }}日期</text>
+          <text class="panel-close iconfont" @click="closeDatePicker">&#xe6b7;</text>
+        </view>
+        <view class="date-picker-body">
+          <!-- 月份标题 -->
+          <view class="calendar-header">
+            <text class="calendar-nav" @click="prevMonth">&#xe6a2;</text>
+            <text class="calendar-title">{{ currentYear }}年{{ currentMonth + 1 }}月</text>
+            <text class="calendar-nav" @click="nextMonth">&#xe6a3;</text>
+          </view>
+          <!-- 星期标题 -->
+          <view class="week-header">
+            <text v-for="day in weekDays" :key="day" class="week-day">{{ day }}</text>
+          </view>
+          <!-- 日期网格 -->
+          <view class="days-grid">
+            <view
+              v-for="(day, index) in calendarDays"
+              :key="index"
+              class="day-cell"
+              :class="{
+                'other-month': !day.isCurrentMonth,
+                'today': day.isToday,
+                'selected': day.isSelected,
+                'disabled': day.isDisabled,
+                'in-range': day.isInRange
+              }"
+              @click="selectDate(day)"
+            >
+              <text class="day-number">{{ day.date }}</text>
+              <text v-if="day.isToday" class="day-tag">今天</text>
+              <text v-else-if="day.isSelected" class="day-tag">{{ datePickerType === 'checkIn' ? '入住' : '离店' }}</text>
+            </view>
+          </view>
+        </view>
+        <view class="date-picker-footer">
+          <view class="date-info">
+            <text class="date-info-text">入住：{{ searchForm.checkInDate }} {{ searchForm.checkInWeek }}</text>
+            <text class="date-info-text">离店：{{ searchForm.checkOutDate }} {{ searchForm.checkOutWeek }}</text>
+            <text class="date-info-text nights">共 {{ nights }} 晚</text>
+          </view>
+          <view class="confirm-btn" @click="closeDatePicker">确定</view>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -286,6 +338,12 @@ const starFilter = ref(0)
 const showCityPanel = ref(false)
 const showPricePanel = ref(false)
 const showStarPanel = ref(false)
+const showDatePicker = ref(false)
+const datePickerType = ref<'checkIn' | 'checkOut'>('checkIn')
+const currentYear = ref(new Date().getFullYear())
+const currentMonth = ref(new Date().getMonth())
+
+const weekDays = ['日', '一', '二', '三', '四', '五', '六']
 
 // ==================== 常量数据 ====================
 const hotCities = ['北京', '上海', '广州', '深圳', '杭州', '成都', '西安', '三亚', '厦门', '昆明']
@@ -566,17 +624,230 @@ const selectCity = (city: string) => {
   showCityPanel.value = false
 }
 
+// ==================== 日期处理工具函数 ====================
+const formatDate = (date: Date) => {
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const day = date.getDate().toString().padStart(2, '0')
+  return `${month}月${day}日`
+}
+
+const getWeekText = (date: Date) => {
+  const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const target = new Date(date)
+  target.setHours(0, 0, 0, 0)
+  const diff = Math.floor((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+  if (diff === 0) return '今天'
+  if (diff === 1) return '明天'
+  if (diff === 2) return '后天'
+  return weekDays[date.getDay()]
+}
+
+const parseDate = (dateStr: string) => {
+  const match = dateStr.match(/(\d{2})月(\d{2})日/)
+  if (!match) return new Date()
+  const month = parseInt(match[1]) - 1
+  const day = parseInt(match[2])
+  const year = new Date().getFullYear()
+  return new Date(year, month, day)
+}
+
+// 计算晚数
+const nights = computed(() => {
+  const checkIn = parseDate(searchForm.value.checkInDate)
+  const checkOut = parseDate(searchForm.value.checkOutDate)
+  const diff = Math.floor((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24))
+  return diff > 0 ? diff : 1
+})
+
+// 日历数据
+const calendarDays = computed(() => {
+  const days: Array<{
+    date: number
+    isCurrentMonth: boolean
+    isToday: boolean
+    isSelected: boolean
+    isDisabled: boolean
+    isInRange: boolean
+    fullDate: Date
+  }> = []
+
+  const year = currentYear.value
+  const month = currentMonth.value
+
+  // 当月第一天
+  const firstDay = new Date(year, month, 1)
+  // 当月最后一天
+  const lastDay = new Date(year, month + 1, 0)
+  // 上月最后一天
+  const prevLastDay = new Date(year, month, 0)
+
+  // 当月第一天是星期几
+  const firstDayWeek = firstDay.getDay()
+
+  // 上月的日期
+  for (let i = firstDayWeek - 1; i >= 0; i--) {
+    const date = new Date(prevLastDay)
+    date.setDate(prevLastDay.getDate() - i)
+    days.push({
+      date: date.getDate(),
+      isCurrentMonth: false,
+      isToday: isSameDay(date, new Date()),
+      isSelected: isSelectedDate(date),
+      isDisabled: isDisabledDate(date),
+      isInRange: isInRange(date),
+      fullDate: date
+    })
+  }
+
+  // 当月的日期
+  for (let i = 1; i <= lastDay.getDate(); i++) {
+    const date = new Date(year, month, i)
+    days.push({
+      date: i,
+      isCurrentMonth: true,
+      isToday: isSameDay(date, new Date()),
+      isSelected: isSelectedDate(date),
+      isDisabled: isDisabledDate(date),
+      isInRange: isInRange(date),
+      fullDate: date
+    })
+  }
+
+  // 下月的日期（补齐到42个格子）
+  const remaining = 42 - days.length
+  for (let i = 1; i <= remaining; i++) {
+    const date = new Date(year, month + 1, i)
+    days.push({
+      date: i,
+      isCurrentMonth: false,
+      isToday: isSameDay(date, new Date()),
+      isSelected: isSelectedDate(date),
+      isDisabled: isDisabledDate(date),
+      isInRange: isInRange(date),
+      fullDate: date
+    })
+  }
+
+  return days
+})
+
+const isSameDay = (d1: Date, d2: Date) => {
+  return d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate()
+}
+
+const isSelectedDate = (date: Date) => {
+  const checkIn = parseDate(searchForm.value.checkInDate)
+  const checkOut = parseDate(searchForm.value.checkOutDate)
+  if (datePickerType.value === 'checkIn') {
+    return isSameDay(date, checkIn)
+  }
+  return isSameDay(date, checkOut)
+}
+
+const isDisabledDate = (date: Date) => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return date < today
+}
+
+const isInRange = (date: Date) => {
+  const checkIn = parseDate(searchForm.value.checkInDate)
+  const checkOut = parseDate(searchForm.value.checkOutDate)
+  return date > checkIn && date < checkOut
+}
+
+const openDatePicker = (type: 'checkIn' | 'checkOut') => {
+  datePickerType.value = type
+  // 设置当前显示月份为选中日期所在月份
+  const targetDate = type === 'checkIn'
+    ? parseDate(searchForm.value.checkInDate)
+    : parseDate(searchForm.value.checkOutDate)
+  currentYear.value = targetDate.getFullYear()
+  currentMonth.value = targetDate.getMonth()
+  showDatePicker.value = true
+}
+
+const closeDatePicker = () => {
+  showDatePicker.value = false
+}
+
+const prevMonth = () => {
+  if (currentMonth.value === 0) {
+    currentMonth.value = 11
+    currentYear.value--
+  } else {
+    currentMonth.value--
+  }
+}
+
+const nextMonth = () => {
+  if (currentMonth.value === 11) {
+    currentMonth.value = 0
+    currentYear.value++
+  } else {
+    currentMonth.value++
+  }
+}
+
+const selectDate = (day: { fullDate: Date; isDisabled: boolean }) => {
+  if (day.isDisabled) return
+
+  const dateStr = formatDate(day.fullDate)
+  const weekStr = getWeekText(day.fullDate)
+
+  if (datePickerType.value === 'checkIn') {
+    searchForm.value.checkInDate = dateStr
+    searchForm.value.checkInWeek = weekStr
+    // 如果入住日期晚于或等于离店日期，自动调整离店日期
+    const checkIn = day.fullDate
+    const checkOut = parseDate(searchForm.value.checkOutDate)
+    if (checkIn >= checkOut) {
+      const newCheckOut = new Date(checkIn)
+      newCheckOut.setDate(newCheckOut.getDate() + 1)
+      searchForm.value.checkOutDate = formatDate(newCheckOut)
+      searchForm.value.checkOutWeek = getWeekText(newCheckOut)
+    }
+  } else {
+    const checkIn = parseDate(searchForm.value.checkInDate)
+    if (day.fullDate <= checkIn) {
+      uni.showToast({ title: '离店日期必须晚于入住日期', icon: 'none' })
+      return
+    }
+    searchForm.value.checkOutDate = dateStr
+    searchForm.value.checkOutWeek = weekStr
+  }
+
+  showDatePicker.value = false
+}
+
 const selectCheckInDate = () => {
-  uni.showToast({ title: '选择入住日期', icon: 'none' })
+  openDatePicker('checkIn')
 }
 
 const selectCheckOutDate = () => {
-  uni.showToast({ title: '选择离店日期', icon: 'none' })
+  openDatePicker('checkOut')
 }
 
 const onSearch = () => {
   hasSearched.value = true
+  // 关键词搜索已在 filteredHotels 计算属性中处理
+  // 城市筛选已在 filteredHotels 计算属性中处理
   uni.showToast({ title: `正在搜索${searchForm.value.city}的酒店`, icon: 'none' })
+}
+
+// 关键词输入时实时搜索（防抖）
+let keywordTimer: ReturnType<typeof setTimeout> | null = null
+const onKeywordInput = () => {
+  if (keywordTimer) clearTimeout(keywordTimer)
+  keywordTimer = setTimeout(() => {
+    if (searchForm.value.keyword.trim()) {
+      hasSearched.value = true
+    }
+  }, 300)
 }
 
 const changeSort = (type: string) => {
@@ -1115,5 +1386,152 @@ const goDetail = (id: number) => {
   background: linear-gradient(90deg, #ff9000 0%, #ff5000 100%);
   color: #ffffff;
   font-weight: 500;
+}
+
+/* ==================== 日期选择器 ==================== */
+.date-picker-panel {
+  background-color: #ffffff;
+  width: 100%;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 32rpx;
+  animation: slideUp 0.3s ease-out;
+}
+
+.date-picker-body {
+  padding: 20rpx 0;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+  padding: 0 20rpx;
+}
+
+.calendar-nav {
+  font-size: 32rpx;
+  color: #666666;
+  padding: 12rpx 24rpx;
+  font-family: 'iconfont';
+}
+
+.calendar-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.week-header {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 16rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  padding-bottom: 16rpx;
+}
+
+.week-day {
+  font-size: 26rpx;
+  color: #999999;
+  width: 80rpx;
+  text-align: center;
+}
+
+.days-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.day-cell {
+  width: calc(100% / 7);
+  height: 100rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.day-number {
+  font-size: 30rpx;
+  color: #333333;
+}
+
+.day-tag {
+  font-size: 20rpx;
+  color: #999999;
+  margin-top: 4rpx;
+}
+
+.day-cell.other-month .day-number {
+  color: #cccccc;
+}
+
+.day-cell.today .day-number {
+  color: #ff5000;
+  font-weight: bold;
+}
+
+.day-cell.today .day-tag {
+  color: #ff5000;
+}
+
+.day-cell.selected {
+  background: linear-gradient(135deg, #ff9000 0%, #ff5000 100%);
+  border-radius: 12rpx;
+}
+
+.day-cell.selected .day-number {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.day-cell.selected .day-tag {
+  color: #ffffff;
+}
+
+.day-cell.disabled .day-number {
+  color: #cccccc;
+}
+
+.day-cell.disabled {
+  opacity: 0.5;
+}
+
+.day-cell.in-range {
+  background-color: #fff2e8;
+}
+
+.date-picker-footer {
+  border-top: 1rpx solid #f0f0f0;
+  padding-top: 24rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.date-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.date-info-text {
+  font-size: 26rpx;
+  color: #666666;
+  margin-bottom: 8rpx;
+}
+
+.date-info-text.nights {
+  color: #ff5000;
+  font-weight: bold;
+}
+
+.confirm-btn {
+  background: linear-gradient(90deg, #ff9000 0%, #ff5000 100%);
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: 500;
+  padding: 20rpx 48rpx;
+  border-radius: 32rpx;
 }
 </style>
